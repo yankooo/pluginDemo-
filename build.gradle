@@ -1,0 +1,66 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.vladsch.flexmark:flexmark-all:0.64.0'
+        classpath 'org.apache.commons:commons-text:1.10.0'
+    }
+}
+
+plugins {
+    id 'java'
+    id 'idea'
+    id 'org.jetbrains.intellij' version '1.17.0'
+}
+
+apply plugin: 'java'
+
+group 'com.ppxai'
+version = '1.0-SNAPSHOT'
+
+dependencies {
+    implementation("com.vladsch.flexmark:flexmark-all:0.64.0")
+}
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+// See https://github.com/JetBrains/gradle-intellij-plugin/
+intellij {
+    //chat webview：randomUUID要求chrome内核>9(2022.1.1),navigator.clipboard.writeText要求2022.3
+    //IDE 2024.1要求SDK版本在2022.2以上
+    version = '2022.2'
+    updateSinceUntilBuild = false
+    // Plugin Dependencies -> https://plugins.jetbrains.com/docs/intellij/plugin-dependencies.html
+    // plugins = ['org.intellij.plugins.markdown']
+    plugins = ["com.intellij.java", "git4idea"]
+}
+
+patchPluginXml {
+    sinceBuild = '222'
+    untilBuild = '242.*'
+}
+
+
+patchPluginXml {
+}
+
+test {
+    useJUnitPlatform()
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+tasks.withType(JavaCompile) {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+
