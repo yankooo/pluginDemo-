@@ -1,4 +1,4 @@
-package com.ppxai.plugindemo.toolwindow;
+package com.ppxai.plugindemo.filepick;
 
 import com.intellij.ide.util.gotoByName.GotoFileModel;
 import com.intellij.ide.util.gotoByName.ChooseByNamePopup;
@@ -8,19 +8,14 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 
-import java.awt.*;
 import java.io.IOException;
-import java.util.Optional;
 
-public class FilePicker {
+public class FilePicker2 {
 
     public static void chooseFile(Project project, FilePickerCallback callback) {
         GotoFileModel model = new GotoFileModel(project);
         ChooseByNamePopup popup = ChooseByNamePopup.createPopup(project, model, (PsiElement) null);
-        // Set initial size of the popup
-        Dimension size = new Dimension(600, 400); // 设置尺寸
         popup.invoke(new ChooseByNamePopupComponent.Callback() {
             @Override
             public void elementChosen(Object element) {

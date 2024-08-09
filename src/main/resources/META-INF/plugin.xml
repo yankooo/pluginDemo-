@@ -15,9 +15,7 @@
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
-
     <actions>
-        <action id="MonitorInputAction" class="com.ppxai.plugindemo.actions.MonitorInputAction" text="Monitor Input" />
         <action id="ShowPopupAction" class="com.ppxai.plugindemo.actions.ShowPopupAction" text="Show Popup">
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
@@ -26,8 +24,11 @@
         </action>
     </actions>
 
-
     <extensions defaultExtensionNs="com.intellij">
+        <intentionAction>
+            <className>com.ppxai.plugindemo.intent.MyOverrideIntentionAction</className>>
+        </intentionAction>
+
         <!-- Register the tool window factory -->
         <toolWindow id="Onegai Copilot" factoryClass="com.ppxai.plugindemo.toolwindow.IssuesToolWindowFactory" anchor="right" />
         <!-- Register LineMarkerProvider -->
