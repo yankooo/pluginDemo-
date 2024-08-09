@@ -1,48 +1,40 @@
 package com.ppxai.plugindemo.mark;
 
-import com.intellij.codeInsight.daemon.GutterIconNavigationHandler;
 import com.intellij.codeInsight.daemon.LineMarkerInfo;
 import com.intellij.codeInsight.daemon.LineMarkerProvider;
+import com.intellij.codeInsight.daemon.impl.MarkerType;
 import com.intellij.openapi.editor.markup.GutterIconRenderer;
-import com.intellij.openapi.ui.popup.JBPopupFactory;
-import com.intellij.openapi.util.IconLoader;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
-import com.intellij.ui.awt.RelativePoint;
-import com.intellij.util.Function;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.awt.event.MouseEvent;
+import java.util.Collection;
+import java.util.List;
 
 public class MyLineMarkerProvider implements LineMarkerProvider {
+
     @Override
     public LineMarkerInfo<?> getLineMarkerInfo(@NotNull PsiElement element) {
-        if (element instanceof PsiMethod && ((PsiMethod) element).getName().equals("methodNameToHighlight")) {
-            // 使用 IconLoader.getIcon(String path, Class<?> aClass) 来加载图标
-            Icon icon = IconLoader.getIcon("/icons/myicon.png", MyLineMarkerProvider.class);
+        PsiMethod method = PsiTreeUtil.getParentOfType(element, PsiMethod.class);
+        if (method == null || !element.getTextRange().equals(method.getTextRange())) return null;
 
-            Function<PsiElement, String> tooltipProvider = psiElement -> "This is a tooltip";
-            GutterIconNavigationHandler<PsiElement> navHandler = (MouseEvent event, PsiElement psiElement) -> showPopup(event);
+        Icon icon = UIManager.getIcon("OptionPane.warningIcon");
 
-            // 使用旧的构造函数创建 LineMarkerInfo
-            return new LineMarkerInfo<>(
-                    element,
-                    element.getTextRange(),
-                    icon,
-                    0,
-                    tooltipProvider,
-                    navHandler,
-                    GutterIconRenderer.Alignment.RIGHT
-            );
-
-        }
-        return null;
+        return new LineMarkerInfo<>(
+                method,
+                method.getTextRange(),
+                icon,
+                element1 -> "Method: " + method.getName(),
+                null,
+                GutterIconRenderer.Alignment.LEFT,
+                () -> "This is a method: " + method.getName()
+        );
     }
 
-    private void showPopup(MouseEvent event) {
-        JBPopupFactory.getInstance()
-                .createMessage("This is a popup")
-                .show(new RelativePoint(event));
+    @Override
+    public void collectSlowLineMarkers(@NotNull List<? extends PsiElement> elements, @NotNull Collection<? super LineMarkerInfo<?>> result) {
+        // Optional: Implement if needed
     }
 }
