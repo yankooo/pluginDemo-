@@ -25,11 +25,17 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
+        <editorFactoryListener implementation="com.ppxai.plugindemo.listener.RandomLineMarkerListener"/>
         <intentionAction>
-            <className>com.ppxai.plugindemo.intent.MyOverrideIntentionAction</className>>
+            <className>com.ppxai.plugindemo.intent.MyOverrideIntentionAction</className>
         </intentionAction>
-
-        <!-- Register the tool window factory -->
+        <localInspection
+                implementationClass="com.ppxai.plugindemo.inspectionTool.MyCustomInspectionTool"
+                displayName="My Custom Inspection"
+                groupName="General"
+                enabledByDefault="true"
+                language="JAVA">
+        </localInspection> <!-- Register the tool window factory -->
         <toolWindow id="Onegai Copilot" factoryClass="com.ppxai.plugindemo.toolwindow.IssuesToolWindowFactory" anchor="right" />
         <!-- Register LineMarkerProvider -->
         <lineMarkerProvider language="JAVA" implementationClass="com.ppxai.plugindemo.mark.MyLineMarkerProvider"/>

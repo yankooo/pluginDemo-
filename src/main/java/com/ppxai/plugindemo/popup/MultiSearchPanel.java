@@ -9,12 +9,10 @@ import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import com.ppxai.plugindemo.filepick.FilePicker;
+import com.ppxai.plugindemo.filepick.ProjectFilePicker;
 import com.ppxai.plugindemo.model.MockResponse;
 import com.ppxai.plugindemo.toolwindow.IssuesToolWindowFactory;
 import com.ppxai.plugindemo.toolwindow.MockBackendService;
-
-import javax.swing.*;
 
 public class MultiSearchPanel {
 
@@ -40,7 +38,7 @@ public class MultiSearchPanel {
                 System.out.println("Chosen element: " + element);
                 if (element instanceof PsiFile) {
                     VirtualFile file = ((PsiFile) element).getVirtualFile();
-                    String content = FilePicker.readFileContent(file);
+                    String content = ProjectFilePicker.readFileContent(file);
                     // Mock sending request to backend and receiving comments
                     MockResponse resp = MockBackendService.getComments(file, project, content);
                     // 动态添加或更新Issues Tab

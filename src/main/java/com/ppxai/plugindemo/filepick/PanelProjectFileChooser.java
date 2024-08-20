@@ -14,10 +14,10 @@ import javax.swing.*;
 import java.awt.*;
 
 // 实现 ChooseByNamePanel 的文件选择器
-public class PanelFileChooser implements FileChooser {
+public class PanelProjectFileChooser implements ProjectFileChooser {
 
     @Override
-    public void chooseFile(Project project, FilePicker.FilePickerCallback callback) {
+    public void chooseFile(Project project, ProjectFilePicker.FilePickerCallback callback) {
         // 创建面板容器
         JPanel popPanel = new JPanel(new BorderLayout());
 

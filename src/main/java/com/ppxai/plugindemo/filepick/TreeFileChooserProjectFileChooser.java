@@ -2,17 +2,13 @@ package com.ppxai.plugindemo.filepick;
 
 import com.intellij.ide.util.TreeFileChooserDialog;
 import com.intellij.ide.util.TreeFileChooserFactory;
-import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFile;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiManager;
-import com.ppxai.plugindemo.filepick.FilePicker;
 
-public class TreeFileChooserFileChooser implements FileChooser {
+public class TreeFileChooserProjectFileChooser implements ProjectFileChooser {
 
     @Override
-    public void chooseFile(Project project, FilePicker.FilePickerCallback callback) {
+    public void chooseFile(Project project, ProjectFilePicker.FilePickerCallback callback) {
         // 获取 TreeFileChooserFactory 的实例
         TreeFileChooserFactory chooserFactory = TreeFileChooserFactory.getInstance(project);
 

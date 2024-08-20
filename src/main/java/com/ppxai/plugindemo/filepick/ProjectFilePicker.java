@@ -5,16 +5,16 @@ import com.intellij.openapi.vfs.VirtualFile;
 
 import java.io.IOException;
 
-public class FilePicker {
+public class ProjectFilePicker {
 
-    private final FileChooser fileChooser;
+    private final ProjectFileChooser projectFileChooser;
 
-    public FilePicker(FileChooser fileChooser) {
-        this.fileChooser = fileChooser;
+    public ProjectFilePicker(ProjectFileChooser projectFileChooser) {
+        this.projectFileChooser = projectFileChooser;
     }
 
     public void chooseFile(Project project, FilePickerCallback callback) {
-        fileChooser.chooseFile(project, callback);
+        projectFileChooser.chooseFile(project, callback);
     }
 
     public static String readFileContent(VirtualFile file) {

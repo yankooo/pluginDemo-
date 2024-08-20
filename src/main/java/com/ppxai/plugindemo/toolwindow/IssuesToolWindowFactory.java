@@ -1,23 +1,36 @@
 package com.ppxai.plugindemo.toolwindow;
 
+import com.intellij.codeInsight.daemon.DaemonCodeAnalyzer;
+import com.intellij.codeInsight.daemon.impl.ShowIntentionsPass;
 import com.intellij.codeInsight.intention.impl.ShowIntentionActionsHandler;
+import com.intellij.codeInspection.*;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.markup.*;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileEditor.OpenFileDescriptor;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.VerticalFlowLayout;
+import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.psi.PsiDocumentManager;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBPanel;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import com.intellij.ui.content.ContentManager;
+import com.ppxai.plugindemo.collapse.CollapsiblePanel;
+import com.ppxai.plugindemo.collapse.CommentItemComponent;
 import com.ppxai.plugindemo.hint.CustomLightBulbHint;
+import com.ppxai.plugindemo.inspectionTool.CodeInspectionUtil;
+import com.ppxai.plugindemo.inspectionTool.MyCustomInspectionTool;
 import com.ppxai.plugindemo.intent.MyGutterIconRenderer;
 import com.ppxai.plugindemo.model.Comment;
 import com.ppxai.plugindemo.model.IssueNodeData;
@@ -34,6 +47,9 @@ import java.util.List;
 import java.awt.*;
 import java.util.Objects;
 
+import static javax.swing.BoxLayout.Y_AXIS;
+import static javax.swing.SwingConstants.LEFT;
+
 public class IssuesToolWindowFactory implements ToolWindowFactory {
 
     private static JTree issuesTree;
@@ -46,6 +62,8 @@ public class IssuesToolWindowFactory implements ToolWindowFactory {
         JPanel chatPanel = new JPanel();
         JLabel chatLabel = new JLabel("Chat Content");
         chatPanel.add(chatLabel);
+        IssuesToolWindowFactory.createOrUpdateIssuesTab(project, new MockResponse());
+
         // 创建 chat tab 的内容
         chatPanel.add(new ChatInputPanel(project), BorderLayout.CENTER);
 
@@ -78,6 +96,35 @@ public class IssuesToolWindowFactory implements ToolWindowFactory {
     }
 
     private static JPanel createIssuesPanel(Project project, List<Comment> comments) {
+        JPanel panel = new JPanel(new VerticalFlowLayout());
+
+
+        JBPanel content = new JBPanel<>();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
+        content.add(new CommentItemComponent("Content for Panel 1"));
+        content.add(new CommentItemComponent("Content for Panel 2"));
+        content.add(new CommentItemComponent("Content for Panel 3"));
+
+        JBPanel<?> mainPanel = new JBPanel<>(new VerticalFlowLayout());
+        // 创建多个折叠面板
+        CollapsiblePanel panel3 = new CollapsiblePanel("Panel 3", content);
+
+        CollapsiblePanel   panel2 = new CollapsiblePanel("Panel 2", new CommentItemComponent("Content for Panel 2"));
+
+        CollapsiblePanel panel1 = new CollapsiblePanel("Panel 1", new CommentItemComponent("Content for Panel 1"));
+
+        // 将折叠面板添加到主面板
+        mainPanel.add(panel3);
+        mainPanel.add(panel2);
+        mainPanel.add(panel1);
+
+        // 将主面板放入一个滚动面板中，处理面板数量过多时的情况
+        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        panel.add(scrollPane);
+        return panel;
+    }
+
+    private static JPanel createIssuesPanel1(Project project, List<Comment> comments) {
         JPanel panel = new JPanel(new BorderLayout());
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Project Issues");
 
@@ -118,6 +165,7 @@ public class IssuesToolWindowFactory implements ToolWindowFactory {
 
                 // 导航到选中的 comment
                 navigateToLine(project, selectedIssue.getFilePath(), selectedIssue.getStartLine());
+                // 创建并启动 ShowIntentionPass 来更新小灯泡
             }
         });
 
@@ -189,25 +237,45 @@ public class IssuesToolWindowFactory implements ToolWindowFactory {
                 }
             }
 
-            // 创建一个 TextAttributes 实例，用于设置背景颜色
-            TextAttributes attributes = new TextAttributes();
-            attributes.setBackgroundColor(JBColor.namedColor("TextAttributes.SELECTION_BACKGROUND_COLOR", JBColor.LIGHT_GRAY)); // 设置背景颜色
+            CodeInspectionUtil.inspectFile(project, virtualFile);
 
-            // 添加高亮区域
-            RangeHighlighter highlighter = markupModel.addRangeHighlighter(
-                    startOffset,
-                    endOffset,
-                    HighlighterLayer.SELECTION,
-                    attributes,
-                    HighlighterTargetArea.EXACT_RANGE
-            );
-            highlighter.setGutterIconRenderer(new MyGutterIconRenderer());
 
-            CustomLightBulbHint customLightBulbHint = new CustomLightBulbHint(project, editor);
-            new ShowIntentionActionsHandler().invoke(project, editor, PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument()));
+//            // 创建一个 TextAttributes 实例，用于设置背景颜色
+//            TextAttributes attributes = new TextAttributes();
+//            attributes.setBackgroundColor(JBColor.namedColor("TextAttributes.SELECTION_BACKGROUND_COLOR", JBColor.LIGHT_GRAY)); // 设置背景颜色
 
-            // 添加图标
-//            updateGutterIconRenderer(highlighter);
+//            // 添加高亮区域
+//            RangeHighlighter highlighter = markupModel.addRangeHighlighter(
+//                    startOffset,
+//                    endOffset,
+//                    HighlighterLayer.SELECTION,
+//                    attributes,
+//                    HighlighterTargetArea.EXACT_RANGE
+//            );
+//            addProblemToJetbrainsProblems(project, document, startOffset, endOffset, "这里有问题 Highlighted issue description");
+
+        }
+    }
+
+    private static void addProblemToJetbrainsProblems(Project project, Document document, int startOffset, int endOffset, String description) {
+        InspectionManager inspectionManager = InspectionManager.getInstance(project);
+        PsiFile psiFile = PsiDocumentManager.getInstance(project).getPsiFile(document);
+
+        if (psiFile != null) {
+            ProblemDescriptor problemDescriptor = inspectionManager.createProblemDescriptor(
+                    psiFile,
+                    new TextRange(startOffset, endOffset),
+                    description,
+                    ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
+                    true,
+                    null);
+
+            ProblemsHolder problemsHolder = new ProblemsHolder(inspectionManager, psiFile, false);
+            MyCustomInspectionTool inspectionTool = new MyCustomInspectionTool();
+//            inspectionTool.registerProblem(problemsHolder, problemDescriptor);
+
+            // 重新启动分析器以显示问题
+            DaemonCodeAnalyzer.getInstance(project).restart(psiFile);
         }
     }
 
