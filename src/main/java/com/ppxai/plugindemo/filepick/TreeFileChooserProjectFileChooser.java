@@ -13,14 +13,14 @@ public class TreeFileChooserProjectFileChooser implements ProjectFileChooser {
         TreeFileChooserFactory chooserFactory = TreeFileChooserFactory.getInstance(project);
 
         // 创建文件选择器对话框
-        TreeFileChooserDialog chooserDialog = (TreeFileChooserDialog) chooserFactory.createFileChooser(
+        MyTreeFileChooserDialog chooserDialog = new MyTreeFileChooserDialog(project,
                 "Select File",
                 null, // PsiFile (可选，可以为 null)
                 null, // FileType (可选，可以为 null)
                 null,  // PsiFileFilter (可选，可以为 null)
                 false
         );
-        chooserDialog.selectSearchByNameTab();
+//        chooserDialog.selectSearchByNameTab();
 
         // 显示对话框
         chooserDialog.show();

@@ -19,7 +19,7 @@ public class MultiSearchPanel {
     public static void show(Project project) {
         // 初始化ChooseByNameModel
         GotoFileModel fileModel = new GotoFileModel(project);
-        ChooseByNamePanel panel = new ChooseByNamePanel(project, fileModel, "", true, null);
+        ChooseByNamePanel panel = new ChooseByNamePanel(project, fileModel, "", false, null);
 
         // 创建并显示自定义的JBPopup
         JBPopup popup = JBPopupFactory.getInstance()
